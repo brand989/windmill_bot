@@ -13,3 +13,7 @@ bot.dzygman.com {
 admin.dzygman.com {
     reverse_proxy localhost:8080
 }
+
+calendar.dzygman.com {
+    reverse_proxy localhost:3002
+}

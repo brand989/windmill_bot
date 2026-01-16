@@ -1,5 +1,5 @@
 services:
-  # PostgreSQL база для Windmill, Typebot и NocoDB
+  # PostgreSQL база для всех сервисов
   windmill_db:
     image: postgres:16
     restart: unless-stopped
@@ -13,6 +13,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # Redis для Cal.com
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --requirepass adwin
+    volumes:
+      - redis_data:/data
 
   # Windmill Server
   windmill_server:
@@ -38,7 +46,7 @@ services:
       windmill_db:
         condition: service_healthy
 
-  # Typebot Builder (интерфейс создания ботов)
+  # Typebot Builder
   typebot_builder:
     image: baptistearno/typebot-builder:latest
     restart: unless-stopped
@@ -54,7 +62,7 @@ services:
       windmill_db:
         condition: service_healthy
 
-  # Typebot Viewer (запуск ботов)
+  # Typebot Viewer
   typebot_viewer:
     image: baptistearno/typebot-viewer:latest
     restart: unless-stopped
@@ -69,7 +77,7 @@ services:
       windmill_db:
         condition: service_healthy
 
-  # NocoDB (админ-панель для FAQ, лидов, календаря)
+  # NocoDB (админка FAQ/лиды/настройки)
   nocodb:
     image: nocodb/nocodb:latest
     restart: unless-stopped
@@ -86,6 +94,25 @@ services:
     volumes:
       - nocodb_data:/usr/app/data
 
+  # Cal.com (календарь записей)
+  calcom:
+    image: calcom/cal.com:latest
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:adwin@windmill_db:5432/calcom
+      DATABASE_DIRECT_URL: postgresql://postgres:adwin@windmill_db:5432/calcom
+      NEXTAUTH_URL: https://calendar.dzygman.com
+      NEXTAUTH_SECRET: Kz9mP2nQ5rS8tU1vW3xY6zA4bC7dE0fH
+      CALENDSO_ENCRYPTION_KEY: Kz9mP2nQ5rS8tU1vW3xY6zA4bC7dE0fH
+      NEXT_PUBLIC_WEBAPP_URL: https://calendar.dzygman.com
+      REDIS_URL: redis://:adwin@redis:6379
+    depends_on:
+      - windmill_db
+      - redis
+
 volumes:
   db_data:
   nocodb_data:
+  redis_data:
