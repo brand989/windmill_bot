@@ -1,0 +1,15 @@
+windmill.dzygman.com {
+    reverse_proxy localhost:8000
+}
+
+typebot.dzygman.com {
+    reverse_proxy localhost:3000
+}
+
+bot.dzygman.com {
+    reverse_proxy localhost:3001
+}
+
+admin.dzygman.com {
+    reverse_proxy localhost:8080
+}

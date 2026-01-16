@@ -1,5 +1,5 @@
 services:
-  # PostgreSQL база для Windmill и Typebot
+  # PostgreSQL база для Windmill, Typebot и NocoDB
   windmill_db:
     image: postgres:16
     restart: unless-stopped
@@ -69,5 +69,23 @@ services:
       windmill_db:
         condition: service_healthy
 
+  # NocoDB (админ-панель для FAQ, лидов, календаря)
+  nocodb:
+    image: nocodb/nocodb:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      NC_DB: "pg://windmill_db:5432?u=postgres&p=adwin&d=nocodb"
+      NC_AUTH_JWT_SECRET: "Kz9mP2nQ5rS8tU1vW3xY6zA4bC7dE0fH"
+      NC_PUBLIC_URL: https://admin.dzygman.com
+      NC_DISABLE_TELE: "true"
+    depends_on:
+      windmill_db:
+        condition: service_healthy
+    volumes:
+      - nocodb_data:/usr/app/data
+
 volumes:
   db_data:
+  nocodb_data:
