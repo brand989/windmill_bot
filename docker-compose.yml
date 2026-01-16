@@ -48,7 +48,7 @@ services:
       DATABASE_URL: postgresql://postgres:adwin@windmill_db:5432/typebot?sslmode=disable
       NEXTAUTH_URL: https://typebot.dzygman.com
       NEXT_PUBLIC_VIEWER_URL: https://bot.dzygman.com
-      ENCRYPTION_SECRET: Kz9mP2nQ5rS8tU1vW3xY6zA4bC7dE0fH2jK5mN8pR1sT4uV7wX0yA3zB6cD9eF2g
+      ENCRYPTION_SECRET: Kz9mP2nQ5rS8tU1vW3xY6zA4bC7dE0fH
       ADMIN_EMAIL: admin@dzygman.com
     depends_on:
       windmill_db:
@@ -64,7 +64,7 @@ services:
       DATABASE_URL: postgresql://postgres:adwin@windmill_db:5432/typebot?sslmode=disable
       NEXTAUTH_URL: https://typebot.dzygman.com
       NEXT_PUBLIC_VIEWER_URL: https://bot.dzygman.com
-      ENCRYPTION_SECRET: Kz9mP2nQ5rS8tU1vW3xY6zA4bC7dE0fH2jK5mN8pR1sT4uV7wX0yA3zB6cD9eF2g
+      ENCRYPTION_SECRET: Kz9mP2nQ5rS8tU1vW3xY6zA4bC7dE0fH
     depends_on:
       windmill_db:
         condition: service_healthy
