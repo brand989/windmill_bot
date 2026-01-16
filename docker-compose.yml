@@ -1,0 +1,73 @@
+services:
+  # PostgreSQL база для Windmill и Typebot
+  windmill_db:
+    image: postgres:16
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: adwin
+      POSTGRES_DB: windmill
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Windmill Server
+  windmill_server:
+    image: ghcr.io/windmill-labs/windmill:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgres://postgres:adwin@windmill_db:5432/windmill?sslmode=disable
+      MODE: server
+    depends_on:
+      windmill_db:
+        condition: service_healthy
+
+  # Windmill Worker
+  windmill_worker:
+    image: ghcr.io/windmill-labs/windmill:latest
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://postgres:adwin@windmill_db:5432/windmill?sslmode=disable
+      MODE: worker
+    depends_on:
+      windmill_db:
+        condition: service_healthy
+
+  # Typebot Builder (интерфейс создания ботов)
+  typebot_builder:
+    image: baptistearno/typebot-builder:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:adwin@windmill_db:5432/typebot?sslmode=disable
+      NEXTAUTH_URL: https://typebot.dzygman.com
+      NEXT_PUBLIC_VIEWER_URL: https://bot.dzygman.com
+      ENCRYPTION_SECRET: Kz9mP2nQ5rS8tU1vW3xY6zA4bC7dE0fH2jK5mN8pR1sT4uV7wX0yA3zB6cD9eF2g
+      ADMIN_EMAIL: admin@dzygman.com
+    depends_on:
+      windmill_db:
+        condition: service_healthy
+
+  # Typebot Viewer (запуск ботов)
+  typebot_viewer:
+    image: baptistearno/typebot-viewer:latest
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:adwin@windmill_db:5432/typebot?sslmode=disable
+      NEXTAUTH_URL: https://typebot.dzygman.com
+      NEXT_PUBLIC_VIEWER_URL: https://bot.dzygman.com
+      ENCRYPTION_SECRET: Kz9mP2nQ5rS8tU1vW3xY6zA4bC7dE0fH2jK5mN8pR1sT4uV7wX0yA3zB6cD9eF2g
+    depends_on:
+      windmill_db:
+        condition: service_healthy
+
+volumes:
+  db_data:
