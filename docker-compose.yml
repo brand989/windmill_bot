@@ -46,7 +46,7 @@ services:
       windmill_db:
         condition: service_healthy
 
-  # Typebot Builder
+  # Typebot Builder (с GitHub OAuth)
   typebot_builder:
     image: baptistearno/typebot-builder:latest
     restart: unless-stopped
@@ -58,6 +58,9 @@ services:
       NEXT_PUBLIC_VIEWER_URL: https://bot.dzygman.com
       ENCRYPTION_SECRET: Kz9mP2nQ5rS8tU1vW3xY6zA4bC7dE0fH
       ADMIN_EMAIL: admin@dzygman.com
+      # GitHub OAuth
+      GITHUB_CLIENT_ID: Ov23lizfIdiNLlHsSM3Y
+      GITHUB_CLIENT_SECRET: 4c36fdbb6f9ea79508f40db1b0cf44a3fd7a9498
     depends_on:
       windmill_db:
         condition: service_healthy
